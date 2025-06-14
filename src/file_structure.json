@@ -1,0 +1,24 @@
+{
+  "member_requests": {
+    "i97rxJWMPrSAfbWxZA69SLKNRKD2": {
+      "name": "Dhruv Shah",
+      "email": "marubharuch@gmail.com",
+      "mobile": "9876543210",
+      "nativePlace": "Ahmedabad",
+      "currentLocation": "Mumbai",
+      "status": "pending",
+      "createdAt": 1712345678
+    }
+  },
+  "users": {
+    "HxjLvyQzWdh3wPFPsTPTWQIqT8v2": {
+      "name": "Test Committee",
+      "email": "committee@example.com",
+      "mobile": "9988776655",
+      "nativePlace": "Surat",
+      "currentLocation": "Pune",
+      "role": "committee",
+      "isActive": true
+    }
+  }
+}

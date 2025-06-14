@@ -1,64 +1,90 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useAuth } from '../context/AuthContext';
-import { Menu, X } from 'lucide-react'; // Make sure `lucide-react` is installed
+import { 
+  Home, 
+  UserPlus, 
+  LogIn, 
+  LogOut, 
+  Bell,
+  UserCheck 
+} from 'lucide-react';
 
 const TopNavBar = () => {
   const { user, role } = useAuth();
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await signOut(auth);
     navigate('/');
   };
 
+  // Common link style
+  const linkStyle = "flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors";
+
   return (
-    <nav className="bg-white shadow px-4 py-3 md:px-6">
-      <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap">
-        <div className="flex items-center justify-between w-full md:w-auto">
+    <nav className="bg-white shadow px-4 py-3">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        {/* Logo/Home Link - Always visible */}
+        <Link to="/" className="flex items-center gap-2">
+          <Home className="text-blue-600" size={20} />
           <h1 className="text-lg font-bold text-blue-600">OSWAL</h1>
-          <button
-            className="md:hidden text-blue-600"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            {menuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
+        </Link>
 
-        <div className={`w-full md:flex md:items-center md:w-auto ${menuOpen ? 'block' : 'hidden'}`}>
-          <div className="flex flex-col md:flex-row gap-3 mt-4 md:mt-0">
-            {role === 'guest' && (
-              <>
-                <Link to="/register" className="text-blue-500 hover:underline">Register</Link>
-                <Link to="/login" className="text-blue-500 hover:underline">Login</Link>
-              </>
-            )}
+        {/* Navigation Links - Horizontal on all screens */}
+        <div className="flex items-center gap-4 md:gap-6">
+          {role === 'guest' && (
+            <>
+              <Link to="/register" className={linkStyle}>
+                <UserPlus size={18} />
+                <span className="hidden sm:inline">Register</span>
+              </Link>
+              <Link to="/login" className={linkStyle}>
+                <LogIn size={18} />
+                <span className="hidden sm:inline">Login</span>
+              </Link>
+            </>
+          )}
 
-            {(role === 'member' || role === 'committee' || role === 'admin') && (
-              <>
-                <Link to="/directory" className="text-blue-500 hover:underline">Family Directory</Link>
-                <button onClick={handleLogout} className="text-red-500 hover:underline">Logout</button>
-              </>
-            )}
+          {(role === 'member' || role === 'committee' || role === 'admin') && (
+            <>
+              <Link to="/families" className={linkStyle}>
+                <span className="hidden sm:inline">Directory</span>
+                <span className="sm:hidden">Dir</span>
+              </Link>
+              
+              {role === 'member' && (
+                <Link to="/request-committee" className={linkStyle}>
+                  <UserCheck size={18} />
+                  <span className="hidden sm:inline">Become Committee</span>
+                </Link>
+              )}
 
-            {role === 'member' && (
-              <Link to="/request-committee" className="text-purple-500 hover:underline">Become Committee Member</Link>
-            )}
+              {(role === 'committee' || role === 'admin') && (
+                <Link 
+                  to={role === 'committee' ? '/member-requests' : '/committee-requests'} 
+                  className={linkStyle}
+                >
+                  <Bell size={18} />
+                  <span className="hidden sm:inline">Notifications</span>
+                </Link>
+              )}
 
-            {role === 'committee' && (
-              <Link to="/member-requests" className="text-green-600 hover:underline">Notifications</Link>
-            )}
+              {role === 'admin' && (
+                <Link to="/role-master" className={linkStyle}>
+                  <span className="hidden sm:inline">Pending</span>
+                  <span className="sm:hidden">Pendings</span>
+                </Link>
+              )}
 
-            {role === 'admin' && (
-              <>
-                <Link to="/committee-requests" className="text-yellow-600 hover:underline">Notifications</Link>
-                <Link to="/role-master" className="text-black hover:underline">User & Role Master</Link>
-              </>
-            )}
-          </div>
+              <button onClick={handleLogout} className={linkStyle}>
+                <LogOut size={18} />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
     </nav>
