@@ -1,0 +1,59 @@
+
+ |   App.css
+ |   App.jsx
+ |   firebase.js
+ |   index.css
+ |   main.jsx
+ |   op.txt
+ |   structure.txt
+ |   
+ assets
+ |       react.svg
+ |       
+ components
+ |    |   ErrorBoundary.jsx
+ |    |   LoadingSpinner.jsx
+ |    |   ProtectedRoute.jsx
+ |    |   TopNavBar.jsx
+ |    |   
+ |   ÀÄÄÄfamilies
+ |           AddMemberButton.jsx
+ |           FamilyCard.jsx
+ |           FamilyForm.jsx
+ |           FamilyLinkPrompt.jsx
+ |           FamilyList.jsx
+ |           index.js
+ |           MemberEditModal.jsx
+ |           SyncButton.jsx
+ |           
+ context
+ |       AuthContext.jsx
+ |       NotificationContext.jsx
+ |       
+ hooks
+ |       localStorageUtils.js
+ |       useAuthUser.js
+ |       useLocalFamilyEdit.js
+ |       
+ lib
+ |       firebaseUtils.js
+ |       
+ pages
+ |    |   CommitteeRequests.jsx
+ |    |   CreateFamilyPage.jsx
+ |    |   Dashboard.jsx
+ |    |   FamiliesPage.jsx
+ |    |   FamilyDetailPage.jsx
+ |    |   FamilyDirectory.jsx
+ |    |   LoginPage.jsx
+ |    |   MemberRequests.jsx
+ |    |   RegisterPage.jsx
+ |    |   UserProfilePage.jsx
+ |    |   UserRoleMaster.jsx
+ |    |   
+ |   ÀÄÄÄadmin
+ |           AdminDashboard.jsx
+ |           
+ÀÄÄÄroutes
+        Routes.jsx
+        

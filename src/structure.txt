@@ -1,0 +1,59 @@
+Folder PATH listing for volume learn
+Volume serial number is 90DB-CD05
+D:.
+|   App.css
+|   App.jsx
+|   firebase.js
+|   index.css
+|   main.jsx
+|   structure.txt
+|   
++---assets
+|       react.svg
+|       
++---components
+|   |   ErrorBoundary.jsx
+|   |   LoadingSpinner.jsx
+|   |   ProtectedRoute.jsx
+|   |   TopNavBar.jsx
+|   |   
+|   \---families
+|           AddMemberButton.jsx
+|           AddMemberModal.jsx
+|           EditMemberModal.jsx
+|           FamilyCard.jsx
+|           FamilyForm.jsx
+|           FamilyList.jsx
+|           index.js
+|           MemberEditModal.jsx
+|           SyncButton.jsx
+|           
++---context
+|       AuthContext.jsx
+|       NotificationContext.jsx
+|       
++---hooks
+|       localStorageUtils.js
+|       useAuthUser.js
+|       useLocalFamilyEdit.js
+|       
++---lib
+|       firebaseUtils.js
+|       
++---pages
+|   |   CommitteeRequests.jsx
+|   |   Dashboard.jsx
+|   |   FamiliesPage.jsx
+|   |   FamilyDetailPage.jsx
+|   |   FamilyDirectory.jsx
+|   |   LoginPage.jsx
+|   |   MemberRequests.jsx
+|   |   RegisterPage.jsx
+|   |   UserRoleMaster.jsx
+|   |   
+|   \---admin
+|           AdminDashboard.jsx
+|           
+\---routes
+        Routes.jsx
+        
