@@ -14,6 +14,7 @@ const EditMemberModal = ({ member, onChange, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center px-4">
       <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm">
+        family list
         <h3 className="text-lg font-semibold mb-4">Edit Member</h3>
         <input
           type="text"
@@ -68,7 +69,12 @@ const FamilyList = () => {
   const [selectedMemberIndex, setSelectedMemberIndex] = useState(null);
   const [editedFamilies, setEditedFamilies] = useState({});
 
-  const { user, role, familyId } = useAuth();
+  //const { user, role, familyId } = useAuth();
+  const { user } = useAuth();
+  const role = user?.role;
+  const familyId = user?.familyId;
+  
+
   const navigate = useNavigate();
 
   const FAMILY_KEY = 'localFamilies';
@@ -181,11 +187,12 @@ const FamilyList = () => {
 
   const canEditFamily = (family) =>
     role === 'admin' || role === 'committee' || family.id === familyId;
+  
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <h1 className="text-3xl font-bold text-gray-800">Family Directory</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Family Directory  1</h1>
         <SyncButton />
         <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
           <input

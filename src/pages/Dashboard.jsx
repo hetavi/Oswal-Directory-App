@@ -1,30 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import localforage from 'localforage';
+
+import LocalForageViewer from '../components/families/LocalForageViewer';
 
 const Dashboard = () => {
   const { role } = useAuth();
-  const [localData, setLocalData] = useState([]);
-
-  useEffect(() => {
-    const loadLocalData = async () => {
-      const allData = [];
-      const keys = await localforage.keys();
-
-      for (const key of keys) {
-        try {
-          const value = await localforage.getItem(key);
-          allData.push({ key, value });
-        } catch (err) {
-          console.error(`Failed to load ${key}:`, err);
-        }
-      }
-
-      setLocalData(allData);
-    };
-
-    loadLocalData();
-  }, []);
+  const [showStorage, setShowStorage] = useState(false);
 
   return (
     <div className="px-4 py-6 max-w-7xl mx-auto">
@@ -46,23 +27,16 @@ const Dashboard = () => {
         </ul>
       </div>
 
-      <div className="bg-white p-4 rounded shadow-md mb-6">
-        <h2 className="text-lg font-semibold mb-2">LocalForage Contents</h2>
-        {localData.length === 0 ? (
-          <p className="text-sm text-gray-500">No data found in localforage.</p>
-        ) : (
-          <ul className="text-sm space-y-2 overflow-auto max-h-[400px]">
-            {localData.map(({ key, value }) => (
-              <li key={key} className="border p-2 rounded bg-gray-50">
-                <strong className="text-blue-600">{key}:</strong>
-                <pre className="whitespace-pre-wrap text-xs text-gray-700">
-                  {JSON.stringify(value, null, 2)}
-                </pre>
-              </li>
-            ))}
-          </ul>
-        )}
+      <div className="mb-6">
+        <button
+          onClick={() => setShowStorage(!showStorage)}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+          {showStorage ? 'Hide' : 'Show'} Local Storage
+        </button>
       </div>
+
+      {showStorage && <LocalForageViewer />}
 
       <div className="text-center md:text-left">
         <p className="text-gray-600 text-sm md:text-base">

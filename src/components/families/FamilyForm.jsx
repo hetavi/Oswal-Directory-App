@@ -147,7 +147,7 @@ console.log('family form')
 
   if (loading && id) return (
     <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500">Family Form</div>
     </div>
   );
 
@@ -162,7 +162,7 @@ console.log('family form')
         {/* Members Section */}
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-gray-800">Family Members</h3>
+            <h3 className="text-lg font-semibold text-gray-800">Family Members 2</h3>
             {formData.members.length === 0 && (
               <span className="text-sm text-red-500">* At least one member required</span>
             )}

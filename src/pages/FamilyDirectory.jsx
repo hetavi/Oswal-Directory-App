@@ -26,7 +26,7 @@ const FamilyDirectory = () => {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold text-center mb-4">Family Directory</h2>
+      <h2 className="text-xl font-bold text-center mb-4">Family Directory 2</h2>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-4 justify-center mb-4">
