@@ -40,7 +40,7 @@ const TopNavBar = () => {
     <nav className="bg-white shadow px-4 py-3 relative z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <Home className="text-blue-600" size={20} />
+         {/* <Home className="text-blue-600" size={20} />*/}
           <h1 className="text-lg font-bold text-blue-600">OSWAL</h1>
         </Link>
 
@@ -74,14 +74,14 @@ const TopNavBar = () => {
               </Link>
 
               {/* Display user initials if no photo */}
-              {!user.photoURL && (
+              {/*!user.photoURL && (
                 <div
                   className="w-8 h-8 rounded-full bg-gray-200 text-sm font-semibold text-gray-600 flex items-center justify-center"
                   title={user.displayName || user.email}
                 >
                   {getShortName()}
                 </div>
-              )}
+              )*/}
 
               {/* Logout icon as last item */}
               <button
