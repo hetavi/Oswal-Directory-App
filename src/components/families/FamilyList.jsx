@@ -128,85 +128,94 @@ const FamilyList = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <h1 className="text-3xl font-bold text-gray-800">Family Directory</h1>
-        <SyncButton />
-        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-          <input
+    <div className="max-w-7xl mx-auto px-1 ">
+   <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+
+{/* Heading + Add/Edit Button in same row */}
+<div className="flex items-center gap-4 flex-wrap">
+  <h1 className="text-3xl font-bold text-gray-800">Family Directory</h1>
+  {user && (role === 'admin' || role === 'committee') && (
+    <Link
+      to="/families/new"
+      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+    >
+      Add New Family
+    </Link>
+  )}
+  {user && (role === 'member' || role === 'guest') && (
+    <Link
+      to={`/families/edit/${familyId}`}
+      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 font-medium text-sm"
+    >
+      Edit My Family
+    </Link>
+  )}
+</div>
+
+{/* Sync Button */}
+<SyncButton />
+
+{/* Sync Changes button */}
+{Object.keys(editedFamilies).length > 0 && (
+  <button
+    onClick={handleSyncToFirebase}
+    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+  >
+    Sync Changes
+  </button>
+)}
+</div>
+
+
+      {/* Filters */}
+      <input
             type="text"
             placeholder="Search by name, location, or phone..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
-          {user ? (
-            role === 'admin' || role === 'committee' ? (
-              <Link
-                to="/families/new"
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-              >
-                Add New Family
-              </Link>
-            ) : role === 'member' || role === 'guest' ? (
-              <Link
-                to={`/families/edit/${familyId}`}
-                className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 font-medium"
-              >
-                Edit My Family
-              </Link>
-            ) : null
-          ) : null}
-          {Object.keys(editedFamilies).length > 0 && (
-            <button
-              onClick={handleSyncToFirebase}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
-            >
-              Sync Changes
-            </button>
-          )}
-        </div>
-      </div>
+      <div className="flex flex-wrap items-start gap-4 mb-6">
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-6">
-        {/* Native Dropdown */}
-        <div>
-          <label className="block text-sm mb-1">Filter by Native</label>
-          <select
-            value={nativeFilter}
-            onChange={(e) => setNativeFilter(e.target.value)}
-            className="border px-4 py-2 rounded"
-          >
-            <option value="">All</option>
-            {uniqueNatives.map(n => (
-              <option key={n} value={n}>{n}</option>
-            ))}
-          </select>
-        </div>
+      
+  {/* Native Dropdown */}
+  <div className="flex flex-col min-w-[200px]">
+  
+    <select
+      value={nativeFilter}
+      onChange={(e) => setNativeFilter(e.target.value)}
+      className="border px-4 py-2 rounded"
+    >
+      <option value="">All</option>
+      {uniqueNatives.map(n => (
+        <option key={n} value={n}>{n}</option>
+      ))}
+    </select>
+  </div>
 
-        {/* Current Horizontal Picker */}
-        <div className="overflow-x-auto whitespace-nowrap w-full">
-          <label className="block text-sm mb-1">Filter by Current</label>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setCurrentFilter('')}
-              className={`px-3 py-1 border rounded-full ${currentFilter === '' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
-            >
-              All
-            </button>
-            {uniqueCurrents.map(curr => (
-              <button
-                key={curr}
-                onClick={() => setCurrentFilter(curr)}
-                className={`px-3 py-1 border rounded-full ${currentFilter === curr ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
-              >
-                {curr}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+  {/* Current Horizontal Picker */}
+  <div className="flex-1 overflow-x-auto whitespace-nowrap">
+   
+    <div className="flex gap-2">
+      <button
+        onClick={() => setCurrentFilter('')}
+        className={`px-3 py-1 border rounded-full ${currentFilter === '' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
+      >
+        All
+      </button>
+      {uniqueCurrents.map(curr => (
+        <button
+          key={curr}
+          onClick={() => setCurrentFilter(curr)}
+          className={`px-3 py-1 border rounded-full ${currentFilter === curr ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
+        >
+          {curr}
+        </button>
+      ))}
+    </div>
+  </div>
+</div>
+
 
       {filteredFamilies.length === 0 ? (
         <div className="text-center py-12 border-2 border-dashed rounded-xl bg-gray-50">
