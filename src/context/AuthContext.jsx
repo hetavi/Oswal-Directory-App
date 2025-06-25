@@ -7,6 +7,7 @@ import { useAuthUser } from '../hooks/useAuthUser';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  console.log('context')
   const { user: firebaseUser, loading: authLoading } = useAuthUser();
 
   const [user, setUser] = useState(null);

@@ -8,7 +8,7 @@ import { saveLocalUser, getLocalUser } from './localStorageUtils';
 export const useAuthUser = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
+console.log("use auth hooks")
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!firebaseUser) {
