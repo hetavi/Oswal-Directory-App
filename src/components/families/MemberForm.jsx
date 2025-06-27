@@ -19,7 +19,9 @@ const MemberForm = ({
   const labelStyle = 'text-xs font-medium text-gray-600';
 
   return (
-    <div className="bg-white p-1 rounded-md shadow-sm border border-gray-200 space-y-1">
+    
+      <div className="bg-white p-1 rounded-md shadow-sm border border-gray-200 space-y-1 [&_input]:bg-yellow-50 [&_input]:border-blue-300 [&_input]:focus:border-blue-500 [&_input]:focus:ring-blue-200">
+
       <div className="flex items-center justify-between mb-1">
         <h2 className="text-base font-semibold text-gray-800">
           Member {index + 1}{' '}

@@ -10,7 +10,8 @@ import CommitteeRequests from '../pages/CommitteeRequests';
 import UserRoleMaster from '../pages/UserRoleMaster';
 import LoadingSpinner from '../components/LoadingSpinner';
 import  Profile  from '../pages/UserProfilePage';
-
+import FamilyAddAndInvite from '../components/families/InviteFamilies';
+import AddFamilies from '../components/families/AddFamilies';
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { role, loading } = useAuth();
@@ -37,7 +38,8 @@ export default function AppRoutes() {
       <Route path="/" element={<Dashboard />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      
+      <Route path="/invite" element={<FamilyAddAndInvite/>}/>
+      <Route path="/addfamilies" element={<AddFamilies/>}/>
       {/* Member+ routes */}
       <Route   path="/directory" element={   <FamilyDirectory /> } 
       />

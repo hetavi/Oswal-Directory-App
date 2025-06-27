@@ -11,7 +11,7 @@ const FamilyForm = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
+console.log(user)
   const isAdminOrCommittee = user?.role === 'admin' || user?.role === 'committee';
 
   const initialFormData = {
@@ -100,17 +100,20 @@ const FamilyForm = () => {
     }
     setLoading(true);
     try {
+      console.log('Form',formData)
       if (id) {
         await update(ref(db, `families/${id}`), {
           ...formData,
           updatedAt: Date.now(),
         });
       } else {
+      
         const isPrivileged = isAdminOrCommittee;
         const isGuest = user?.role === 'guest';
         const familyId = isPrivileged ? push(ref(db, 'families')).key : `fam_${user?.uid}`;
         const newFamilyRef = ref(db, `families/${familyId}`);
         const pin = isGuest ? '0000' : Math.floor(1000 + Math.random() * 9000).toString();
+         console.log("else",user?.uid)
         await set(newFamilyRef, {
           ...formData,
           id: familyId,
@@ -155,7 +158,7 @@ const FamilyForm = () => {
       })
     }
     placeholder="Native"
-    className="input input-bordered w-1/2"
+    className="input input-bordered w-1/2 bg-yellow-50 border-blue-300 focus:border-blue-500 focus:ring-blue-200"
   />
 
   <input
@@ -171,9 +174,10 @@ const FamilyForm = () => {
       })
     }
     placeholder="Current City"
-    className="input input-bordered w-1/2"
+    className="input input-bordered w-1/2 bg-yellow-50 border-blue-300 focus:border-blue-500 focus:ring-blue-200"
   />
 </div>
+
 
 
 

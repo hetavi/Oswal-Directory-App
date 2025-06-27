@@ -4,24 +4,24 @@ import localforage from 'localforage';
 import { db } from '../firebase';
 
 import { useAuthUser } from '../hooks/useAuthUser';
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  console.log('context')
   const { user: firebaseUser, loading: authLoading } = useAuthUser();
 
   const [user, setUser] = useState(null);
   const [role, setRole] = useState('guest');
   const [hydrated, setHydrated] = useState(false);
   const [error, setError] = useState(null);
-  const [needsFamilyLinking, setNeedsFamilyLinking] = useState(false); // ✅ NEW
+  const [needsFamilyLinking, setNeedsFamilyLinking] = useState(false);
 
   useEffect(() => {
     const loadUserData = async () => {
       if (!firebaseUser) {
         setUser(null);
         setRole('guest');
-        setNeedsFamilyLinking(false); // Reset if logged out
+        setNeedsFamilyLinking(false);
         setHydrated(true);
         return;
       }
@@ -29,31 +29,32 @@ export const AuthProvider = ({ children }) => {
       try {
         const cached = await localforage.getItem(`user-${firebaseUser.uid}`);
         if (cached) {
-          setUser(cached);
+          const fullUser = {
+            ...cached,
+            uid: firebaseUser.uid, // ✅ ensure uid is always included
+          };
+          setUser(fullUser);
           setRole(cached.role || 'member');
+          setNeedsFamilyLinking(!cached.familyId && !!cached.mobile);
           setHydrated(true);
-          setNeedsFamilyLinking(!cached.familyId && !!cached.mobile); // ✅ from cache
           return;
         }
 
         const snapshot = await get(ref(db, `users/${firebaseUser.uid}`));
         if (snapshot.exists()) {
           const dbUser = snapshot.val();
-          const safeFirebaseUser = {
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            displayName: firebaseUser.displayName,
-            photoURL: firebaseUser.photoURL,
-          };
 
           const fullUser = {
-            ...safeFirebaseUser,
+            uid: firebaseUser.uid, // ✅ always include Firebase uid
+            email: firebaseUser.email || dbUser.email,
+            displayName: firebaseUser.displayName || dbUser.name,
+            photoURL: firebaseUser.photoURL,
             ...dbUser,
           };
 
           setUser(fullUser);
           setRole(dbUser.role || 'member');
-          setNeedsFamilyLinking(!dbUser.familyId && !!dbUser.mobile); // ✅ after fetch
+          setNeedsFamilyLinking(!dbUser.familyId && !!dbUser.mobile);
           await localforage.setItem(`user-${firebaseUser.uid}`, fullUser);
         }
 
@@ -77,7 +78,7 @@ export const AuthProvider = ({ children }) => {
     isAdmin: role === 'admin',
     isCommittee: role === 'committee',
     isMember: role === 'member',
-    needsFamilyLinking, // ✅ exposed to consumers like ProfilePage
+    needsFamilyLinking,
   };
 
   return (
