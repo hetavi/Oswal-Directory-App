@@ -138,13 +138,44 @@ const FamilyForm = () => {
     );
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-4xl mx-auto bg-slate-100 px-1 py-1">
       {error && <p className="text-red-600 mb-4">{error}</p>}
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-xl shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input type="text" name="native" value={formData.native} onChange={handleChange} placeholder="Native Address" className="input input-bordered" />
-          <input type="text" name="current" value={formData.current} onChange={handleChange} placeholder="Current Address" className="input input-bordered" />
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-1 bg-white p-1 rounded-xl shadow-sm">
+      <div className="flex gap-4 w-full">
+  <input
+    type="text"
+    name="native"
+    value={formData.native}
+    onChange={(e) =>
+      handleChange({
+        target: {
+          name: 'native',
+          value: e.target.value.toUpperCase(),
+        },
+      })
+    }
+    placeholder="Native"
+    className="input input-bordered w-1/2"
+  />
+
+  <input
+    type="text"
+    name="current"
+    value={formData.current}
+    onChange={(e) =>
+      handleChange({
+        target: {
+          name: 'current',
+          value: e.target.value.toUpperCase(),
+        },
+      })
+    }
+    placeholder="Current City"
+    className="input input-bordered w-1/2"
+  />
+</div>
+
+
 
         {formData.members.map((member, index) => (
           <MemberForm

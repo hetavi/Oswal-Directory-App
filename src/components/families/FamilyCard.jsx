@@ -5,6 +5,7 @@ const FamilyCard = ({ family, onMemberEdit, canEdit }) => {
   return (
     <div className="border rounded-xl p-5 shadow-sm bg-white">
       <div className="flex justify-between items-start mb-4">
+        card
         <div>
           <h3 className="text-xl font-semibold text-gray-800">
             <span className="text-blue-600">{family.native}</span> → <span className="text-green-600">{family.current}</span>

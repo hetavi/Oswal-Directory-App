@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import EditMemberModal from './EditMemberModal';
 import FamilyCard from './FamilyCard';
 import useFamilySync from '../../hooks/useFamilySync';
+import { useFamily } from '../../context/FamilyContext';
 const FamilyList = () => {
  // const [families, setFamilies] = useState([]);
   const [editedFamilies, setEditedFamilies] = useState({});
@@ -24,16 +25,8 @@ const FamilyList = () => {
 
   const FAMILY_KEY = 'localFamilies';
   const EDIT_KEY = 'editedFamilies';
-  const { families, setFamilies, loading } = useFamilySync();
-  useEffect(() => {
-    const loadLocal = async () => {
-      const localData = await localforage.getItem(FAMILY_KEY);
-      const editedData = await localforage.getItem(EDIT_KEY);
-      setFamilies(localData || []);
-      setEditedFamilies(editedData || {});
-    };
-    loadLocal();
-  }, []);
+  const { families, setFamilies, loading } = useFamily();
+ 
   
 
   const uniqueNatives = [...new Set(families.map(f => f.native).filter(Boolean))];

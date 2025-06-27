@@ -16,7 +16,7 @@ const App = () => {
         <NotificationProvider>
           <div className="min-h-screen flex flex-col bg-white">
             <TopNavBar />
-            <main className="flex-grow w-full max-w-7xl mx-auto px-4 py-6">
+            <main className="flex-grow w-full max-w-7xl mx-auto px-2 py-2">
               {loading ? (
                 <LoadingSpinner />
               ) : (
