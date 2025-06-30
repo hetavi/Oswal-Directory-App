@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [hydrated, setHydrated] = useState(false);
   const [error, setError] = useState(null);
   const [needsFamilyLinking, setNeedsFamilyLinking] = useState(false);
-
+  console.log('subit')
   useEffect(() => {
     const loadUserData = async () => {
       if (!firebaseUser) {

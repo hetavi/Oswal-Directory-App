@@ -33,47 +33,63 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-  
+    console.log('Form submitted with:', formData);
+
     try {
       let userCredential, email;
+
+      console.log('Fetching all users...');
       const usersSnapshot = await get(ref(db, 'users'));
-  
+      console.log('Users fetched:', usersSnapshot.val());
+
       if (formData.authType === 'gmail') {
+        console.log('Signing in with Google...');
         const provider = new GoogleAuthProvider();
         userCredential = await signInWithPopup(auth, provider);
         email = userCredential.user.email;
+        console.log('Google user created:', email);
       } else {
+        console.log('Using email/password...');
         if (formData.password !== formData.confirmPassword) {
           return setError('Passwords do not match.');
         }
+
+        console.log('Creating user with email:', formData.gmail);
         userCredential = await createUserWithEmailAndPassword(
           auth,
           formData.gmail,
           formData.password
         );
         email = formData.gmail;
+        console.log('Email user created:', email);
       }
-  
+
       const uid = userCredential.user.uid;
+      console.log('User UID:', uid);
+
       const isDuplicate = Object.values(usersSnapshot.val() || {}).some(
         (user) => user.gmail === email
       );
-      if (isDuplicate) return setError('Email already registered.');
-  
-      // 🔍 Match family
+      if (isDuplicate) {
+        console.log('Duplicate email found:', email);
+        return setError('Email already registered.');
+      }
+
+      // Family linking
+      console.log('Checking for family match...');
       const familiesSnapshot = await get(ref(db, 'families'));
       const families = familiesSnapshot.val() || {};
       let linkedFamilyId = null;
       let matchedRole = 'guest';
       let matchedStatus = 'pending';
       let matchedByOwnMobile = false;
-  
+
       Object.entries(families).forEach(([fid, fam]) => {
         const members = fam.members || [];
         const mobileMatch = members.some((m) => m.mobile === formData.mobile);
         const altMatch = members.some((m) => m.mobile === formData.altMobile);
         const pinMatches = fam.pin && formData.pin === fam.pin;
-  
+
         if (!linkedFamilyId && mobileMatch) {
           linkedFamilyId = fid;
           matchedByOwnMobile = true;
@@ -87,13 +103,16 @@ const RegisterPage = () => {
           matchedStatus = 'approved';
         }
       });
-  
-      // 🏡 If no family matched, create one
+
+      console.log('Matched familyId:', linkedFamilyId);
+
+      // Create new family if not matched
       let isNewFamily = false;
       if (!linkedFamilyId) {
         linkedFamilyId = `fam_${uid}`;
         isNewFamily = true;
-  
+        console.log('No family match. Creating new family:', linkedFamilyId);
+
         const newFamily = {
           id: linkedFamilyId,
           native: formData.native,
@@ -111,12 +130,13 @@ const RegisterPage = () => {
             },
           ],
         };
-  
+
         localStorage.setItem('draftFamily', JSON.stringify(newFamily));
         await set(ref(db, `families/${linkedFamilyId}`), newFamily);
+        console.log('New family created');
       }
-  
-      // 👤 Save user
+
+      // Save user profile
       const userProfile = {
         name: formData.name,
         mobile: formData.mobile,
@@ -128,11 +148,41 @@ const RegisterPage = () => {
         familyId: linkedFamilyId,
         createdFamily: isNewFamily,
       };
+
+      console.log('Saving user profile...');
       await set(ref(db, `users/${uid}`), userProfile);
-  
-      // 💾 Save local profile
+      console.log('User profile saved');
+
+      // Add/update family member
+      if (linkedFamilyId) {
+        console.log('Updating members in family:', linkedFamilyId);
+        const familyMembersRef = ref(db, `families/${linkedFamilyId}/members`);
+        const familyMembersSnap = await get(familyMembersRef);
+        let members = familyMembersSnap.exists() ? familyMembersSnap.val() : [];
+
+        let memberIndex = Object.values(members).findIndex((m) => m.mobile === formData.mobile);
+        const memberData = {
+          name: formData.name,
+          mobile: formData.mobile,
+          relation: 'Self',
+          role: matchedRole === 'member' ? 'family_member' : 'guest',
+          isPrimary: true,
+        };
+
+        if (memberIndex !== -1) {
+          const memberKey = Object.keys(members)[memberIndex];
+          console.log('Updating existing member:', memberKey);
+          await set(ref(db, `families/${linkedFamilyId}/members/${memberKey}`), memberData);
+        } else {
+          const newMemberIndex = Object.keys(members).length;
+          console.log('Adding new member at index:', newMemberIndex);
+          await set(ref(db, `families/${linkedFamilyId}/members/${newMemberIndex}`), memberData);
+        }
+      }
+
       localStorage.setItem('userProfile', JSON.stringify({ ...userProfile, uid }));
-  
+      console.log('Local userProfile saved');
+
       if (matchedRole === 'guest' || isNewFamily) {
         alert('Registration successful. Please create or complete your family.');
         navigate('/families/new');
@@ -141,10 +191,10 @@ const RegisterPage = () => {
         navigate('/family');
       }
     } catch (err) {
+      console.error('Registration error:', err);
       setError(err.message);
     }
   };
-  
 
   return (
     <div className="max-w-md mx-auto p-6">
