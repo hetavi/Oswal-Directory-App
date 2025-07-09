@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { ref, set } from 'firebase/database';
+import React, { useState } from 'react';
+import { ref, set, get } from 'firebase/database';
 import { db } from '../../firebase';
 import localforage from 'localforage';
 import { Link } from 'react-router-dom';
@@ -7,10 +7,9 @@ import SyncButton from './SyncButton';
 import { useAuth } from '../../context/AuthContext';
 import EditMemberModal from './EditMemberModal';
 import FamilyCard from './FamilyCard';
-import useFamilySync from '../../hooks/useFamilySync';
 import { useFamily } from '../../context/FamilyContext';
+
 const FamilyList = () => {
- // const [families, setFamilies] = useState([]);
   const [editedFamilies, setEditedFamilies] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
   const [nativeFilter, setNativeFilter] = useState('');
@@ -18,6 +17,7 @@ const FamilyList = () => {
   const [selectedMember, setSelectedMember] = useState(null);
   const [selectedFamilyId, setSelectedFamilyId] = useState(null);
   const [selectedMemberIndex, setSelectedMemberIndex] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false); // ⏳ Refresh loading
 
   const { user } = useAuth();
   const role = user?.role;
@@ -26,8 +26,6 @@ const FamilyList = () => {
   const FAMILY_KEY = 'localFamilies';
   const EDIT_KEY = 'editedFamilies';
   const { families, setFamilies, loading } = useFamily();
- 
-  
 
   const uniqueNatives = [...new Set(families.map(f => f.native).filter(Boolean))];
   const uniqueCurrents = [...new Set(families.map(f => f.current).filter(Boolean))];
@@ -84,93 +82,124 @@ const FamilyList = () => {
     alert('Changes synced successfully');
   };
 
+  // 🔁 Refresh from Firebase & clear local cache
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await localforage.removeItem(FAMILY_KEY);
+      await localforage.removeItem(EDIT_KEY);
+
+      const snapshot = await get(ref(db, 'families'));
+      const freshFamilies = snapshot.val() ? Object.values(snapshot.val()) : [];
+
+      setFamilies(freshFamilies);
+      await localforage.setItem(FAMILY_KEY, freshFamilies);
+
+      alert('Data refreshed from server.');
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      alert('Failed to refresh data. Please try again.');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-1">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-      <div className="flex items-center gap-4 flex-nowrap overflow-x-auto min-w-0">
-  <h1 className="text-2xl font-bold text-gray-800 whitespace-nowrap">Family Directory</h1>
+        <div className="flex items-center gap-4 flex-nowrap overflow-x-auto min-w-0">
+          <h1 className="text-2xl font-bold text-gray-800 whitespace-nowrap">Family Directory</h1>
 
-  {user && (role === 'admin' || role === 'committee') && (
-    <Link
-      to="/families/new"
-      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm whitespace-nowrap"
-    >
-      Add New Family
-    </Link>
-  )}
+          {user && (role === 'admin' || role === 'committee') && (
+            <Link
+              to="/families/new"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm whitespace-nowrap"
+            >
+              Add New Family
+            </Link>
+          )}
 
-  {user && (role === 'member' || role === 'guest') && (
-    <Link
-      to={`/families/edit/${familyId}`}
-      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 font-medium text-sm whitespace-nowrap"
-    >
-      Edit My Family
-    </Link>
-  )}
-</div>
+          {user && (role === 'member' || role === 'guest') && (
+            <Link
+              to={`/families/edit/${familyId}`}
+              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 font-medium text-sm whitespace-nowrap"
+            >
+              Edit My Family
+            </Link>
+          )}
+        </div>
 
+        <div className="flex flex-wrap items-center gap-3">
+          <SyncButton />
 
-        <SyncButton />
+          {Object.keys(editedFamilies).length > 0 && (
+            <button
+              onClick={handleSyncToFirebase}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+            >
+              Sync Changes
+            </button>
+          )}
 
-        {Object.keys(editedFamilies).length > 0 && (
           <button
-            onClick={handleSyncToFirebase}
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium disabled:opacity-50"
           >
-            Sync Changes
+            {isRefreshing ? 'Refreshing...' : '🔄 Refresh from Server'}
           </button>
-        )}
+        </div>
       </div>
-{/* 🔹 Current City Buttons */}
-<div className="flex items-center gap-2 overflow-x-auto pb-2 mb-1">
-  <button
-    onClick={() => setCurrentFilter('')}
-    className={`shrink-0 px-2 py-1 border rounded-full ${currentFilter === '' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
-  >
-    All
-  </button>
 
-  <div className="flex gap-2">
-    {uniqueCurrents.map(curr => (
-      <button
-        key={curr}
-        onClick={() => setCurrentFilter(curr)}
-        className={`px-3 py-1 border rounded-full whitespace-nowrap ${currentFilter === curr ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
-      >
-        {curr}
-      </button>
-    ))}
-  </div>
-</div>
+      {/* 🔹 Current City Buttons */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-1">
+        <button
+          onClick={() => setCurrentFilter('')}
+          className={`shrink-0 px-2 py-1 border rounded-full ${currentFilter === '' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
+        >
+          All
+        </button>
 
-{/* 🔹 Native + Search Filter Row (Always one row) */}
-<div className="flex gap-4 mb-1 w-full">
-  <div className="w-[40%]">
-    <select
-      value={nativeFilter}
-      onChange={(e) => setNativeFilter(e.target.value)}
-      className="w-full border px-1 py-2 rounded"
-    >
-      <option value="">All</option>
-      {uniqueNatives.map(n => (
-        <option key={n} value={n}>{n}</option>
-      ))}
-    </select>
-  </div>
+        <div className="flex gap-2">
+          {uniqueCurrents.map(curr => (
+            <button
+              key={curr}
+              onClick={() => setCurrentFilter(curr)}
+              className={`px-3 py-1 border rounded-full whitespace-nowrap ${currentFilter === curr ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
+            >
+              {curr}
+            </button>
+          ))}
+        </div>
+      </div>
 
-  <div className="w-[60%]">
-    <input
-      type="text"
-      placeholder="Search by name, location, or phone..."
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-    />
-  </div>
-</div>
+      {/* 🔹 Native + Search Filter Row */}
+      <div className="flex gap-4 mb-1 w-full">
+        <div className="w-[40%]">
+          <select
+            value={nativeFilter}
+            onChange={(e) => setNativeFilter(e.target.value)}
+            className="w-full border px-1 py-2 rounded"
+          >
+            <option value="">All</option>
+            {uniqueNatives.map(n => (
+              <option key={n} value={n}>{n}</option>
+            ))}
+          </select>
+        </div>
 
-    
+        <div className="w-[60%]">
+          <input
+            type="text"
+            placeholder="Search by name, location, or phone..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
 
+      {/* 🔹 Family List */}
       {filteredFamilies.length === 0 ? (
         <div className="text-center py-12 border-2 border-dashed rounded-xl bg-gray-50">
           <p className="text-lg text-gray-500">No families found</p>

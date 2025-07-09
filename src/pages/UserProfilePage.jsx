@@ -37,8 +37,10 @@ const UserProfilePage = () => {
       const userRef = ref(db, `users/${uid}`);
       const snapshot = await get(userRef);
       const data = snapshot.val();
+
       setUserData(data);
       setOriginalData(data); // Save original for comparison
+      await localforage.setItem(`user-${uid}`, data); // ✅ Update local cache
 
       if (data?.familyId) {
         const pinSnap = await get(ref(db, `families/${data.familyId}/pin`));

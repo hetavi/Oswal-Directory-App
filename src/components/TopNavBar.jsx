@@ -12,6 +12,9 @@ import {
   User,
   BookOpen,
   Users,
+  ShoppingCart,
+  Plus,
+  List,
 } from 'lucide-react';
 
 const TopNavBar = () => {
@@ -40,50 +43,45 @@ const TopNavBar = () => {
     <nav className="bg-white shadow px-4 py-3 relative z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-         {/* <Home className="text-blue-600" size={20} />*/}
           <h1 className="text-lg font-bold text-blue-600">OSWAL</h1>
         </Link>
 
         <div className="flex items-center gap-4 md:gap-6">
           {/* Always visible links */}
-         
           <Link to="/families" className={linkStyle('/families')}>
-            
             <span className="sm:inline">Dir</span>
           </Link>
           <Link to="/about" className={linkStyle('/about')}>
-           
             <span className="sm:inline">About Us</span>
           </Link>
 
           {/* Show if user is logged in */}
-          {user ? (
+          {user && (
             <>
+              {/* Buy & Sell visible to member, committee, admin */}
+              {['member', 'committee', 'admin'].includes(role) && (
+                <>
+                  <Link to="/buy-sell" className={linkStyle('/buy-sell')}>
+                    <ShoppingCart size={16} />
+                    <span className="sm:inline">Buy & Sell</span>
+                  </Link>
+                  
+                </>
+              )}
+
               {/* Show 'Pending' for committee or admin */}
               {(role === 'admin' || role === 'committee') && (
                 <Link to="/role-master" className={linkStyle('/role-master')}>
-                
-                  <span className=" sm:inline">role</span>
+                  <span className="sm:inline">Role</span>
                 </Link>
               )}
 
-              {/* Profile icon and label */}
+              {/* Profile */}
               <Link to="/profile" className={linkStyle('/profile')}>
-               
                 <span className="sm:inline">Me</span>
               </Link>
 
-              {/* Display user initials if no photo */}
-              {/*!user.photoURL && (
-                <div
-                  className="w-8 h-8 rounded-full bg-gray-200 text-sm font-semibold text-gray-600 flex items-center justify-center"
-                  title={user.displayName || user.email}
-                >
-                  {getShortName()}
-                </div>
-              )*/}
-
-              {/* Logout icon as last item */}
+              {/* Logout */}
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 text-gray-700 hover:text-red-600 transition-colors"
@@ -92,9 +90,11 @@ const TopNavBar = () => {
                 <span className="hidden sm:inline">Logout</span>
               </button>
             </>
-          ) : (
+          )}
+
+          {/* Guest links */}
+          {!user && (
             <>
-              {/* Guest links */}
               <Link to="/register" className={linkStyle('/register')}>
                 <UserPlus size={18} />
                 <span className="hidden sm:inline">Signup</span>
